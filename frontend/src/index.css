@@ -402,7 +402,16 @@ body {
   overflow-y: auto;
 }
 .ai-inputbar { align-items: flex-end; }
-.ai-send { min-width: 56px; height: 52px; padding: 0 16px; font-size: 20px; border-radius: 16px; }
+.ai-send {
+  min-width: 56px !important;
+  width: 56px !important;
+  flex: 0 0 56px !important;
+  height: 52px;
+  padding: 0 !important;
+  font-size: 20px;
+  border-radius: 16px;
+}
+.ai-inputbar .ai-textarea { flex: 1 1 auto !important; width: auto !important; min-width: 0; }
 
 /* Nút floating Hỏi AI trên trang Home */
 .ai-fab {
