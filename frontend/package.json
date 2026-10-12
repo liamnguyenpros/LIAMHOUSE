@@ -1,0 +1,1 @@
+{"dependencies":{"react":"^18.3.1","react-dom":"^18.3.1","react-router-dom":"^6.26.2"},"description":"LIAMHOUSE T1 MVP frontend — React PWA mobile-first","devDependencies":{"@vitejs/plugin-react":"^5.0.0","vite":"^5.4.8"},"name":"liamhouse-frontend","private":true,"scripts":{"build":"vite build","dev":"vite","preview":"vite preview"},"type":"module","version":"1.0.0"}
