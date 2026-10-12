@@ -390,7 +390,19 @@ body {
   z-index: 5;
 }
 .ai-inputbar .input { flex: 1; margin: 0; }
-.ai-send { min-width: 52px; padding: 0 16px; font-size: 18px; }
+.ai-textarea {
+  resize: none;
+  min-height: 52px;
+  max-height: 140px;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-family: inherit;
+  overflow-y: auto;
+}
+.ai-inputbar { align-items: flex-end; }
+.ai-send { min-width: 56px; height: 52px; padding: 0 16px; font-size: 20px; border-radius: 16px; }
 
 /* Nút floating Hỏi AI trên trang Home */
 .ai-fab {

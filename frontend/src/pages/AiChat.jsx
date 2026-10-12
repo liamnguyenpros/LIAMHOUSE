@@ -18,6 +18,7 @@ export default function AiChat() {
   const [outOfCredits, setOutOfCredits] = useState(false);
   const [toppingUp, setToppingUp] = useState(false);
   const bottomRef = useRef(null);
+  const inputRef = useRef(null);
 
   async function loadQuota() {
     try {
@@ -40,6 +41,7 @@ export default function AiChat() {
     const question = (text ?? input).trim();
     if (!question || sending) return;
     setInput('');
+    if (inputRef.current) inputRef.current.style.height = 'auto';
     setOutOfCredits(false);
     setMessages((m) => [...m, { role: 'user', text: question }]);
     setSending(true);
@@ -158,13 +160,19 @@ export default function AiChat() {
       </div>
 
       <div className="ai-inputbar">
-        <input
-          className="input"
+        <textarea
+          ref={inputRef}
+          className="input ai-textarea"
           placeholder="Hỏi AI về công việc của bạn…"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            setInput(e.target.value);
+            e.target.style.height = 'auto';
+            e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px';
+          }}
           onKeyDown={onKeyDown}
           disabled={sending}
+          rows={2}
         />
         <button
           className="btn btn-primary ai-send"
