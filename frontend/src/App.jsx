@@ -19,6 +19,10 @@ import Kpi from './pages/Kpi.jsx';
 import NhacNo from './pages/NhacNo.jsx';
 import AiChat from './pages/AiChat.jsx';
 import Commission from './pages/Commission.jsx';
+import Promotions from './pages/Promotions.jsx';
+import CommissionRules from './pages/CommissionRules.jsx';
+import CallCampaigns from './pages/CallCampaigns.jsx';
+import Integrations from './pages/Integrations.jsx';
 
 function RequireAuth({ children }) {
   if (!getToken()) return <Navigate to="/dang-nhap" replace />;
@@ -44,6 +48,10 @@ function Shell() {
           <Route path="/kpi" element={<Kpi />} />
           <Route path="/nhac-no" element={<NhacNo />} />
           <Route path="/hoa-hong" element={<Commission />} />
+          <Route path="/khuyen-mai" element={<Promotions />} />
+          <Route path="/cau-hinh-hoa-hong" element={<CommissionRules />} />
+          <Route path="/chien-dich-goi" element={<CallCampaigns />} />
+          <Route path="/tich-hop" element={<Integrations />} />
           <Route path="/ai-chat" element={<AiChat />} />
           <Route path="/them" element={<More />} />
         </Routes>

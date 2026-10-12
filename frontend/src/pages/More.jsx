@@ -18,6 +18,10 @@ export default function More() {
     { icon: '📊', label: 'KPI cá nhân', to: '/kpi' },
     { icon: '⚠️', label: 'Nhắc nợ', to: '/nhac-no' },
     { icon: '💰', label: 'Hoa hồng', to: '/hoa-hong' },
+    { icon: '🏷️', label: 'Khuyến mãi', to: '/khuyen-mai' },
+    { icon: '⚙️', label: 'Cấu hình hoa hồng', to: '/cau-hinh-hoa-hong' },
+    { icon: '📞', label: 'Chiến dịch gọi', to: '/chien-dich-goi' },
+    { icon: '🔌', label: 'Tích hợp gọi điện', to: '/tich-hop' },
     { icon: '🔔', label: 'Thông báo', to: '/thong-bao' },
   ];
 

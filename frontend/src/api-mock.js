@@ -16,6 +16,35 @@ data.payment_schedules = [
   { id: 'ps-2', deal_id: 'c5567fc6-de3f-499c-b925-beb44ef57e88', dot_number: 2, label: 'Đợt 1', due_date: '2026-09-15', amount: 1000000000, paid_amount: 500000000, con_no: 500000000, trang_thai_hien_tai: 'qua_han', note: '' },
   { id: 'ps-3', deal_id: 'c5567fc6-de3f-499c-b925-beb44ef57e88', dot_number: 3, label: 'Đợt 2', due_date: '2026-10-20', amount: 2000000000, paid_amount: 0, con_no: 2000000000, trang_thai_hien_tai: 'sap_den_han', note: '' },
 ];
+// Khuyến mãi mẫu
+data.price_policies = [
+  { id: 'pp-1', project_id: 'b8b28090-28ac-4ad9-89c8-0b00fcbff128', name: 'Chiết khấu mở bán đợt 1', discount_rate: 2, gift: 'Tặng gói nội thất 50tr', valid_from: '2026-10-01', valid_to: '2026-12-31', created_at: '2026-10-06 11:07:01' },
+  { id: 'pp-2', project_id: '6fc98abc-4f01-40c2-99af-d251d8b4aca9', name: 'Ưu đãi thanh toán sớm 95%', discount_rate: 5, gift: null, valid_from: '2026-09-01', valid_to: '2026-10-31', created_at: '2026-10-06 11:07:01' },
+];
+// Rule hoa hồng mẫu
+data.commission_rules = [
+  { id: 'cr-1', name: 'HH sale Vinhomes Grand Park', project_id: 'b8b28090-28ac-4ad9-89c8-0b00fcbff128', role: 'sale', commission_type: 'ca_nhan', rate: 3, valid_from: '2026-01-01', valid_to: null, status: 'active', created_at: '2026-10-06 11:07:01' },
+  { id: 'cr-2', name: 'HH sale mặc định', project_id: null, role: 'sale', commission_type: 'ca_nhan', rate: 2.5, valid_from: null, valid_to: null, status: 'active', created_at: '2026-10-06 11:07:01' },
+];
+// Cấu hình KPI mẫu
+data.kpi_configs = [
+  { id: 'kc-1', metric: 'calls', target_value: 200, period_type: 'thang', warning_threshold: 60, is_active: true, created_at: '2026-10-06 11:07:01' },
+  { id: 'kc-2', metric: 'leads_new', target_value: 40, period_type: 'thang', warning_threshold: 60, is_active: true, created_at: '2026-10-06 11:07:01' },
+  { id: 'kc-3', metric: 'deals_closed', target_value: 3, period_type: 'thang', warning_threshold: 50, is_active: true, created_at: '2026-10-06 11:07:01' },
+];
+data.kpi_snapshots = [
+  { id: 'ks-1', metric: 'calls', actual_value: 150, target_value: 200, period_type: 'thang', snapshot_at: '2026-10-05 18:00:00', created_at: '2026-10-05 18:00:00' },
+  { id: 'ks-2', metric: 'deals_closed', actual_value: 2, target_value: 3, period_type: 'thang', snapshot_at: '2026-10-05 18:00:00', created_at: '2026-10-05 18:00:00' },
+];
+// Chiến dịch gọi mẫu
+data.call_campaigns = [
+  { id: 'cc-1', name: 'Gọi lại lead cũ tháng 9', lead_count: 5, status: 'draft', total_calls: 0, success_calls: 0, created_at: '2026-10-10 09:00:00' },
+  { id: 'cc-2', name: 'Chăm sóc lead Facebook', lead_count: 3, status: 'running', total_calls: 2, success_calls: 1, created_at: '2026-10-11 14:00:00' },
+];
+// Tích hợp tổng đài mẫu
+data.integrations = [
+  { id: 'ig-1', provider: 'stringee', api_key: 'sk_test_xxxx1234', settings: { hotline: '1900xxxx', record: true }, is_active: true, created_at: '2026-10-06 11:07:01' },
+];
 
 // Chỉ tiêu KPI mẫu (bản demo)
 const KPI_LABELS = { cuoc_goi: 'Cuộc gọi', lich_hen: 'Lịch hẹn', dan_xem: 'Dẫn xem', chot_deal: 'Chốt deal' };
@@ -515,6 +544,117 @@ export async function mockApi(path, opts = {}) {
     deal.updated_at = now;
     data.activities.push({ id: uid(), lead_id: deal.lead_id, owner_id: DEMO_USER.id, type: 'doi_trang_thai', content: `Chuyển sang đặt cọc ${Number(body.deposit_amount).toLocaleString('vi-VN')}đ`, created_at: now });
     return { ok: true, ...deal };
+  }
+
+  // --- Module mới: Khuyến mãi / Cấu hình HH / KPI configs / Chiến dịch gọi / Tích hợp (demo) ---
+  if (rawPath === '/price-policies' && method === 'GET') {
+    return { data: data.price_policies || [] };
+  }
+  if (rawPath === '/price-policies' && method === 'POST') {
+    const p = { id: uid(), ...body, created_at: nowLocal() };
+    (data.price_policies = data.price_policies || []).push(p);
+    return { ok: true, ...p };
+  }
+  m = rawPath.match(/^\/price-policies\/([^/]+)$/);
+  if (m && (method === 'PATCH' || method === 'DELETE')) {
+    const arr = data.price_policies || [];
+    const i = arr.findIndex((x) => x.id === m[1]);
+    if (i < 0) throw new Error('Không tìm thấy chính sách');
+    if (method === 'DELETE') { arr.splice(i, 1); return { ok: true }; }
+    arr[i] = { ...arr[i], ...body };
+    return { ok: true, ...arr[i] };
+  }
+
+  if (rawPath === '/commission-rules' && method === 'GET') {
+    return { data: data.commission_rules || [] };
+  }
+  if (rawPath === '/commission-rules' && method === 'POST') {
+    const r = { id: uid(), status: 'active', ...body, created_at: nowLocal() };
+    (data.commission_rules = data.commission_rules || []).push(r);
+    return { ok: true, ...r };
+  }
+  m = rawPath.match(/^\/commission-rules\/([^/]+)$/);
+  if (m && (method === 'PATCH' || method === 'DELETE')) {
+    const arr = data.commission_rules || [];
+    const i = arr.findIndex((x) => x.id === m[1]);
+    if (i < 0) throw new Error('Không tìm thấy rule');
+    if (method === 'DELETE') { arr.splice(i, 1); return { ok: true }; }
+    arr[i] = { ...arr[i], ...body };
+    return { ok: true, ...arr[i] };
+  }
+
+  if (rawPath === '/kpis/configs' && method === 'GET') {
+    return { data: data.kpi_configs || [] };
+  }
+  if (rawPath === '/kpis/configs' && method === 'POST') {
+    const c = { id: uid(), is_active: true, ...body, created_at: nowLocal() };
+    (data.kpi_configs = data.kpi_configs || []).push(c);
+    return { ok: true, ...c };
+  }
+  m = rawPath.match(/^\/kpis\/configs\/([^/]+)$/);
+  if (m && method === 'PATCH') {
+    const arr = data.kpi_configs || [];
+    const i = arr.findIndex((x) => x.id === m[1]);
+    if (i < 0) throw new Error('Không tìm thấy cấu hình');
+    arr[i] = { ...arr[i], ...body };
+    return { ok: true, ...arr[i] };
+  }
+  if (rawPath === '/kpis/snapshot' && method === 'POST') {
+    const s = { id: uid(), snapshot_at: nowLocal(), metric: body.metric || 'all', actual_value: body.actual_value ?? 0, target_value: body.target_value ?? 0, period_type: body.period_type || 'thang' };
+    (data.kpi_snapshots = data.kpi_snapshots || []).push(s);
+    return { ok: true, ...s };
+  }
+  if (rawPath === '/kpis/history' && method === 'GET') {
+    let rows = data.kpi_snapshots || [];
+    if (q.metric) rows = rows.filter((x) => x.metric === q.metric || x.metric === 'all');
+    if (q.period_type) rows = rows.filter((x) => x.period_type === q.period_type || !x.period_type);
+    return { data: rows };
+  }
+
+  if (rawPath === '/call-campaigns' && method === 'GET') {
+    return { data: data.call_campaigns || [] };
+  }
+  if (rawPath === '/call-campaigns' && method === 'POST') {
+    const c = { id: uid(), status: 'draft', lead_count: 3, total_calls: 0, success_calls: 0, ...body, created_at: nowLocal() };
+    (data.call_campaigns = data.call_campaigns || []).push(c);
+    return { ok: true, ...c };
+  }
+  m = rawPath.match(/^\/call-campaigns\/([^/]+)\/status$/);
+  if (m && method === 'PATCH') {
+    const c = (data.call_campaigns || []).find((x) => x.id === m[1]);
+    if (!c) throw new Error('Không tìm thấy chiến dịch');
+    c.status = body.status;
+    return { ok: true, ...c };
+  }
+  m = rawPath.match(/^\/call-campaigns\/([^/]+)\/leads$/);
+  if (m && method === 'GET') {
+    return { data: (data.leads || []).slice(0, 5) };
+  }
+  m = rawPath.match(/^\/call-campaigns\/([^/]+)$/);
+  if (m && method === 'DELETE') {
+    const arr = data.call_campaigns || [];
+    const i = arr.findIndex((x) => x.id === m[1]);
+    if (i < 0) throw new Error('Không tìm thấy chiến dịch');
+    arr.splice(i, 1);
+    return { ok: true };
+  }
+
+  if (rawPath === '/integrations' && method === 'GET') {
+    return { data: (data.integrations || []).map((x) => ({ ...x, api_key_masked: '••••••••' + String(x.api_key || '').slice(-4) })) };
+  }
+  if (rawPath === '/integrations' && method === 'POST') {
+    const it = { id: uid(), ...body, created_at: nowLocal() };
+    (data.integrations = data.integrations || []).push(it);
+    return { ok: true, ...it, api_key_masked: '••••••••' };
+  }
+  m = rawPath.match(/^\/integrations\/([^/]+)$/);
+  if (m && (method === 'PATCH' || method === 'DELETE')) {
+    const arr = data.integrations || [];
+    const i = arr.findIndex((x) => x.id === m[1]);
+    if (i < 0) throw new Error('Không tìm thấy tích hợp');
+    if (method === 'DELETE') { arr.splice(i, 1); return { ok: true }; }
+    arr[i] = { ...arr[i], ...body };
+    return { ok: true, ...arr[i], api_key_masked: '••••••••' };
   }
 
   throw new Error('API demo chưa hỗ trợ: ' + method + ' ' + path);

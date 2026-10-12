@@ -21,6 +21,10 @@ import shareRoutes from './routes/share.js';
 import matchingRoutes from './routes/matching.js';
 import paymentSchedulesRoutes from './routes/payment-schedules.js';
 import commissionsRoutes from './routes/commissions.js';
+import callCampaignsRoutes from './routes/call-campaigns.js';
+import integrationsRoutes from './routes/integrations.js';
+import pricePoliciesRoutes from './routes/price-policies.js';
+import commissionRulesRoutes from './routes/commission-rules.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -101,6 +105,10 @@ app.use('/api/share', shareRoutes);
 app.use('/api/matching', matchingRoutes);
 app.use('/api', paymentSchedulesRoutes); // /deals/:dealId/payment-schedules*, /payment-schedules/*
 app.use('/api/commissions', commissionsRoutes);
+app.use('/api/price-policies', pricePoliciesRoutes);
+app.use('/api/commission-rules', commissionRulesRoutes);
+app.use('/api/call-campaigns', callCampaignsRoutes);
+app.use('/api/integrations', integrationsRoutes);
 
 // Phục vụ frontend PWA (build thật, gọi API cùng origin qua /api/*)
 const FRONT_DIST = path.join(__dirname, '..', 'frontend', 'dist');

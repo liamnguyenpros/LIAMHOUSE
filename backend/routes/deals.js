@@ -355,18 +355,35 @@ router.post('/:id/close', async (req, res) => {
         `UPDATE deals SET status = 'ky_hd', contract_at = now(), updated_at = now() WHERE id = $1`,
         [d.id]
       );
-      // Tự sinh hoa hồng cá nhân 3% giá chốt (quy tắc toàn vẹn: qua deal_id → lead + property).
-      // Chống trùng: chỉ tạo khi deal chưa có dòng commission nào.
+      // Tự sinh hoa hồng cá nhân theo cấu hình (quy tắc toàn vẹn: qua deal_id → lead + property).
+      // Ưu tiên rule khớp: project_id của deal (hoặc null = mọi dự án), type ca_nhan, role sale,
+      // status active, còn trong hạn valid_from/valid_to. Không có rule → fallback 3%.
       const existingComm = await client.query(
         'SELECT id FROM commissions WHERE deal_id = $1 LIMIT 1',
         [d.id]
       );
       if (!existingComm.rows[0] && d.agreed_price != null && Number(d.agreed_price) > 0) {
-        const amount = Math.round(Number(d.agreed_price) * 0.03 * 100) / 100;
+        const dealProjectId = d.property_id
+          ? (await client.query('SELECT project_id FROM properties WHERE id = $1', [d.property_id])).rows[0]?.project_id
+          : null;
+        const ruleRes = await client.query(
+          `SELECT rate FROM commission_rules
+           WHERE status = 'active'
+             AND commission_type = 'ca_nhan'
+             AND role = 'sale'
+             AND (project_id IS NULL OR project_id = $1)
+             AND (valid_from IS NULL OR valid_from <= CURRENT_DATE)
+             AND (valid_to IS NULL OR valid_to >= CURRENT_DATE)
+           ORDER BY project_id NULLS LAST, created_at DESC
+           LIMIT 1`,
+          [dealProjectId]
+        );
+        const rate = ruleRes.rows[0] ? Number(ruleRes.rows[0].rate) : 3.0;
+        const amount = Math.round(Number(d.agreed_price) * (rate / 100) * 100) / 100;
         await client.query(
           `INSERT INTO commissions (deal_id, sale_id, team_id, type, rate, amount, status)
-           VALUES ($1, $2, $3, 'ca_nhan', 3.00, $4, 'cho_duyet')`,
-          [d.id, d.sale_id, d.team_id || null, amount]
+           VALUES ($1, $2, $3, 'ca_nhan', $4, $5, 'cho_duyet')`,
+          [d.id, d.sale_id, d.team_id || null, rate, amount]
         );
       }
       if (d.property_id) {
