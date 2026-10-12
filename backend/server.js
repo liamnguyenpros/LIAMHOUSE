@@ -27,6 +27,7 @@ import pricePoliciesRoutes from './routes/price-policies.js';
 import commissionRulesRoutes from './routes/commission-rules.js';
 import publicLeadsRoutes from './routes/public-leads.js';
 import apiKeysRoutes from './routes/api-keys.js';
+import propertiesRoutes from './routes/properties.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -113,6 +114,7 @@ app.use('/api/commission-rules', commissionRulesRoutes);
 app.use('/api/call-campaigns', callCampaignsRoutes);
 app.use('/api/integrations', integrationsRoutes);
 app.use('/api/api-keys', apiKeysRoutes);
+app.use('/api/properties', propertiesRoutes);
 
 // Phục vụ frontend PWA (build thật, gọi API cùng origin qua /api/*)
 const FRONT_DIST = path.join(__dirname, '..', 'frontend', 'dist');

@@ -205,6 +205,51 @@ export async function mockApi(path, opts = {}) {
     return { ...project, properties: data.properties.filter((p) => p.project_id === m[1]), documents: data.documents.filter((d) => d.project_id === m[1]) };
   }
 
+  // --- Properties (sản phẩm) ---
+  if (rawPath === '/properties' && method === 'GET') {
+    const pid = q.project_id;
+    const list = pid ? data.properties.filter((p) => p.project_id === pid) : [...data.properties];
+    return list;
+  }
+  if (rawPath === '/properties' && method === 'POST') {
+    if (!body.project_id) throw new Error('Thiếu dự án');
+    if (!body.code || !body.code.trim()) throw new Error('Vui lòng nhập mã căn');
+    if (!body.price || Number(body.price) <= 0) throw new Error('Vui lòng nhập giá hợp lệ');
+    const p = {
+      id: uid(), project_id: body.project_id, code: body.code.trim(),
+      type: body.type || 'can_ho', area: body.area != null ? Number(body.area) : null,
+      bedrooms: body.bedrooms != null ? Number(body.bedrooms) : null,
+      direction: body.direction || null, floor: body.floor != null ? Number(body.floor) : null,
+      tower: null, price: Number(body.price), status: body.status || 'dang_ban',
+      created_at: nowLocal(),
+    };
+    data.properties.push(p);
+    return { ok: true, ...p };
+  }
+  m = rawPath.match(/^\/properties\/([^/]+)$/);
+  if (m) {
+    const prop = data.properties.find((p) => p.id === m[1]);
+    if (!prop) throw new Error('Không tìm thấy sản phẩm');
+    if (method === 'GET') return prop;
+    if (method === 'PATCH') {
+      if (body.code !== undefined && body.code.trim()) prop.code = body.code.trim();
+      if (body.type !== undefined) prop.type = body.type;
+      if (body.area !== undefined) prop.area = body.area != null ? Number(body.area) : null;
+      if (body.bedrooms !== undefined) prop.bedrooms = body.bedrooms != null ? Number(body.bedrooms) : null;
+      if (body.direction !== undefined) prop.direction = body.direction || null;
+      if (body.floor !== undefined) prop.floor = body.floor != null ? Number(body.floor) : null;
+      if (body.price !== undefined && Number(body.price) > 0) prop.price = Number(body.price);
+      if (body.status !== undefined) prop.status = body.status;
+      return { ok: true, ...prop };
+    }
+    if (method === 'DELETE') {
+      const hasDeal = data.deals.some((d) => d.property_id === prop.id);
+      if (hasDeal) throw new Error('Không thể xóa: sản phẩm đã có giao dịch');
+      data.properties = data.properties.filter((p) => p.id !== prop.id);
+      return { ok: true };
+    }
+  }
+
   // --- Deals ---
   if (rawPath === '/deals' && method === 'GET') return dealsList();
   if (rawPath === '/deals' && method === 'POST') {
