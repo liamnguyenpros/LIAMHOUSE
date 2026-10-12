@@ -23,6 +23,7 @@ import Promotions from './pages/Promotions.jsx';
 import CommissionRules from './pages/CommissionRules.jsx';
 import CallCampaigns from './pages/CallCampaigns.jsx';
 import Integrations from './pages/Integrations.jsx';
+import ApiKeys from './pages/ApiKeys.jsx';
 
 function RequireAuth({ children }) {
   if (!getToken()) return <Navigate to="/dang-nhap" replace />;
@@ -52,6 +53,7 @@ function Shell() {
           <Route path="/cau-hinh-hoa-hong" element={<CommissionRules />} />
           <Route path="/chien-dich-goi" element={<CallCampaigns />} />
           <Route path="/tich-hop" element={<Integrations />} />
+          <Route path="/api-keys" element={<ApiKeys />} />
           <Route path="/ai-chat" element={<AiChat />} />
           <Route path="/them" element={<More />} />
         </Routes>

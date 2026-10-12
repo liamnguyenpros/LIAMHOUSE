@@ -156,6 +156,14 @@ if [ -f "$APP_ROOT/db/006-hold-queue.sql" ]; then
 else
   log "Không có file 006 trong gói → bỏ qua."
 fi
+for m in 007-pricing-commission-rules 008-kpi-system 009-call-campaigns 010-public-api; do
+  if [ -f "$APP_ROOT/db/$m.sql" ]; then
+    log "Chạy migration $m (idempotent)..."
+    psql -h localhost -U "$PGUSER" -d "$PGDB" -v ON_ERROR_STOP=1 -q -f "$APP_ROOT/db/$m.sql"
+  else
+    log "Không có file $m trong gói → bỏ qua."
+  fi
+done
 
 # ---------- 7. Seed demo (chỉ khi chưa có user nào) ----------
 USER_COUNT="$(psql -h localhost -U "$PGUSER" -d "$PGDB" -tAc 'SELECT COUNT(*) FROM users')"

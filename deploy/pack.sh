@@ -29,6 +29,10 @@ cp "$APP_DIR/backend/migrations/003-matching-payments.sql" "$STAGE/db/003-matchi
 cp "$APP_DIR/backend/migrations/004-ai-gateway.sql" "$STAGE/db/004-ai-gateway.sql"
 cp "$APP_DIR/backend/migrations/005-commissions.sql" "$STAGE/db/005-commissions.sql"
 cp "$APP_DIR/backend/migrations/006-hold-queue.sql" "$STAGE/db/006-hold-queue.sql"
+cp "$APP_DIR/backend/migrations/007-pricing-commission-rules.sql" "$STAGE/db/007-pricing-commission-rules.sql"
+cp "$APP_DIR/backend/migrations/008-kpi-system.sql" "$STAGE/db/008-kpi-system.sql"
+cp "$APP_DIR/backend/migrations/009-call-campaigns.sql" "$STAGE/db/009-call-campaigns.sql"
+cp "$APP_DIR/backend/migrations/010-public-api.sql" "$STAGE/db/010-public-api.sql"
 echo "      backend: $(du -sh "$STAGE/app/backend" | cut -f1) (chưa có node_modules)"
 
 echo "[3/4] Nén tarball..."

@@ -192,6 +192,12 @@ export async function mockApi(path, opts = {}) {
 
   // --- Projects ---
   if (rawPath === '/projects' && method === 'GET') return [...data.projects];
+  if (rawPath === '/projects' && method === 'POST') {
+    if (!body.name || !body.name.trim()) throw new Error('Nhập tên dự án');
+    const p = { id: uid(), name: body.name.trim(), location: body.location || null, developer: body.developer || null, description: body.description || null, status: body.status || 'dang_mo_ban', can_con_trong: 0, created_at: nowLocal() };
+    data.projects.push(p);
+    return { ok: true, ...p };
+  }
   m = rawPath.match(/^\/projects\/([^/]+)$/);
   if (m && method === 'GET') {
     const project = data.projects.find((p) => p.id === m[1]);
@@ -655,6 +661,28 @@ export async function mockApi(path, opts = {}) {
     if (method === 'DELETE') { arr.splice(i, 1); return { ok: true }; }
     arr[i] = { ...arr[i], ...body };
     return { ok: true, ...arr[i], api_key_masked: '••••••••' };
+  }
+
+  // --- API Keys (webhook leads) ---
+  if (rawPath === '/api-keys' && method === 'GET') {
+    return { data: (data.api_keys || []).map((k) => ({ id: k.id, name: k.name, key_prefix: k.key_prefix, is_active: k.is_active, last_used_at: k.last_used_at || null, created_at: k.created_at })) };
+  }
+  if (rawPath === '/api-keys' && method === 'POST') {
+    if (!body.name || !body.name.trim()) throw new Error('Nhập tên cho key');
+    const rand = () => Math.random().toString(36).slice(2, 10);
+    const full = 'lhpak_' + rand() + rand();
+    const k = { id: uid(), name: body.name.trim(), api_key: full, key_prefix: full.slice(0, 10), is_active: true, last_used_at: null, created_at: nowLocal() };
+    (data.api_keys = data.api_keys || []).push(k);
+    return { id: k.id, name: k.name, api_key: full, key_prefix: k.key_prefix };
+  }
+  m = rawPath.match(/^\/api-keys\/([^/]+)$/);
+  if (m && (method === 'PATCH' || method === 'DELETE')) {
+    const arr = data.api_keys || [];
+    const i = arr.findIndex((x) => x.id === m[1]);
+    if (i < 0) throw new Error('Không tìm thấy API key');
+    if (method === 'DELETE') { arr.splice(i, 1); return { ok: true }; }
+    arr[i] = { ...arr[i], ...body };
+    return { ok: true, ...arr[i] };
   }
 
   throw new Error('API demo chưa hỗ trợ: ' + method + ' ' + path);

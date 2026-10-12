@@ -25,6 +25,8 @@ import callCampaignsRoutes from './routes/call-campaigns.js';
 import integrationsRoutes from './routes/integrations.js';
 import pricePoliciesRoutes from './routes/price-policies.js';
 import commissionRulesRoutes from './routes/commission-rules.js';
+import publicLeadsRoutes from './routes/public-leads.js';
+import apiKeysRoutes from './routes/api-keys.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -99,6 +101,7 @@ app.use('/api/notifications', notificationsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/call-logs', callLogsRoutes);
 app.use('/api/kpis', kpisRoutes);
+app.use('/api', publicLeadsRoutes); // POST /api/public/leads — webhook ngoài, KHÔNG cần JWT (phải đứng trước các router /api có auth)
 app.use('/api', projectDocsRoutes); // GET+POST /projects/:id/docs, DELETE /project-docs/:id
 app.use('/api/export', exportRoutes);
 app.use('/api/share', shareRoutes);
@@ -109,6 +112,7 @@ app.use('/api/price-policies', pricePoliciesRoutes);
 app.use('/api/commission-rules', commissionRulesRoutes);
 app.use('/api/call-campaigns', callCampaignsRoutes);
 app.use('/api/integrations', integrationsRoutes);
+app.use('/api/api-keys', apiKeysRoutes);
 
 // Phục vụ frontend PWA (build thật, gọi API cùng origin qua /api/*)
 const FRONT_DIST = path.join(__dirname, '..', 'frontend', 'dist');
